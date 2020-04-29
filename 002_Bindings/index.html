@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!doctype html>
+<html>
+<body>
+
+	<div id="add">
+	</div>
+
+	<div id="mult">
+	</div>
+
+	<div id="div">
+	</div>
+
+	<div id="sub">
+	</div>
+
+</body>
+<script>
+
+function start(){
+    var div_res = Module.divide(10, 2);
+    var mult_res = Module.mult(10, 2);
+    var add_res = Module.add(10, 2);
+    var sub_res = Module.sub(10, 2);
+
+    console.log('Div result: ' + div_res);
+    console.log('Mult result: ' + mult_res);
+    console.log('Add result: ' + add_res);
+    console.log('Sub result: ' + sub_res);
+
+    document.getElementById("div").innerHTML = "Div Result: " + div_res;
+    document.getElementById("mult").innerHTML = "Mult Result: " + mult_res;
+    document.getElementById("add").innerHTML = "Add Result: " + add_res;
+    document.getElementById("sub").innerHTML = "Sub Result: " + sub_res;
+}
+
+var Module = {onRuntimeInitialized: start};
+
+</script>
+<script src="bin/calc.js"></script>
+</html>
