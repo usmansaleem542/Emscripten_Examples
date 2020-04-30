@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script src="bin/overlay.js"></script>
+<script>
+    // Ref Link https://stackoverflow.com/questions/17883799/how-to-handle-passing-returning-array-pointers-to-emscripten-compiled-code
+    function getSampleFloat32Array(len){
+        var arr = new Float32Array(len);
+        for (var i = 0; i < arr.length; i++)
+            arr[i] = (Math.random() * 100).toFixed(2)
+        return arr
+    }
+
+    function printOutputArray(offset, length){
+        var output = new Float32Array(length)
+        for (var i = 0; i < length; i++)
+            output[i] = Module.getValue(offset + (i * 4), 'float')
+        console.log("Output: ----> ", output)
+    }
+
+    function arrayToHeap(data){
+        var offset = Module._malloc(data.byteLength)
+        Module.HEAPF32.set(data, offset/4);
+        return offset
+    }
+    Module['onRuntimeInitialized'] = onRuntimeInitialized;
+    const overlaySound = Module.cwrap('overlaySound','number',['number', 'number']) // 2nd way
+
+    function onRuntimeInitialized() {
+        let arrLength = 5;
+        var data = getSampleFloat32Array(arrLength)
+        var data_offset = arrayToHeap(data)
+
+        var data2 = getSampleFloat32Array(arrLength)
+        var data2_offset = arrayToHeap(data2);
+
+        var finalArray = new Float32Array(arrLength)
+        var finOffset = arrayToHeap(finalArray);
+
+        let res = overlaySound(data_offset, data2_offset, finOffset, arrLength)
+        printOutputArray(res, arrLength)
+    }
+
+</script>
+</html>

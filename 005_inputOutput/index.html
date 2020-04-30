@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script src="bin/function.js"></script>
+<script>
+    Module['onRuntimeInitialized'] = onRuntimeInitialized;
+    const int_sqrt = Module.cwrap('int_sqrt', 'number', ['number'])
+
+    function onRuntimeInitialized() {
+        console.log(int_sqrt(10));
+        var result = Module.ccall('int_sqrt', // name of C function
+            'number', // return type
+            ['number'], // argument types
+            [28]);
+        console.log(result);
+    }
+
+</script>
+</html>

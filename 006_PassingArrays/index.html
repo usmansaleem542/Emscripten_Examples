@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script src="bin/function.js"></script>
+<script>
+    // Ref Link https://stackoverflow.com/questions/17883799/how-to-handle-passing-returning-array-pointers-to-emscripten-compiled-code
+    function getSampleFloat64Array(len){
+        var arr = new Float64Array(len);
+        for (var i = 0; i < arr.length; i++)
+            arr[i] = i+1
+        return arr
+    }
+
+    function printReturnedArray(offset){
+        console.log(Module.getValue(offset, 'double'))
+    }
+
+    Module['onRuntimeInitialized'] = onRuntimeInitialized;
+    const int_sqrt = Module.cwrap('int_sqrt', 'number', ['number'])
+    const displayArrayA = Module.cwrap('displayArray','number',['array', 'number']) // 1st Way
+    const displayArray = Module.cwrap('displayArray','number',['number', 'number']) // 2nd way
+
+    function onRuntimeInitialized() {
+        // var array = getSampleFloat64Array(20);
+        // let nArr = new Uint8Array(array.buffer)
+        // var offsetA = displayArrayA(nArr);  // 1st Way
+        // printReturnedArray(offsetA)
+
+        // 2nd way And Recommended
+        var offset = Module._malloc(24)
+        Module.HEAPF64.set(new Float64Array([1,2,3]), offset/8);
+        let res = displayArray(offset, 3)
+        printReturnedArray(res)
+
+
+        console.log(int_sqrt(10));
+        var result = Module.ccall('int_sqrt', // name of C function
+            'number', // return type
+            ['number'], // argument types
+            [28]);
+        console.log(result);
+    }
+
+</script>
+</html>
