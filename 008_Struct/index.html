@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script src="bin/struct.js"></script>
+<script>
+    function allocateMemoryOnStack(){
+        var sp = Module.Runtime.stackSave();
+        var ret = Module.allocate(24, 'i8', Module.ALLOC_STACK);
+        var ptr_a = Module.allocate(24, 'i8', Module.ALLOC_STACK);
+        Module.HEAPF64[(ptr_a >> 3) + 0] = Math.random();
+        Module.HEAPF64[(ptr_a >> 3) + 1] = Math.random();
+        Module.HEAPF64[(ptr_a >> 3) + 2] = Math.random();
+        Module.ccall("Foo",
+            'number',
+            ['number', 'number', 'number'],
+            [ret, ptr_a, 21]
+        );
+        console.log(
+            sp,
+            Module.HEAPF64[(ret >> 3) + 0],
+            Module.HEAPF64[(ret >> 3) + 1],
+            Module.HEAPF64[(ret >> 3) + 2]);
+        Module.Runtime.stackRestore(sp);
+    }
+
+    Module['onRuntimeInitialized'] = onRuntimeInitialized;
+    // const overlaySound = Module.cwrap('overlaySound','number',['number', 'number']) // 2nd way
+
+    function onRuntimeInitialized() {
+        var x = new Module.MyStruct();
+        var ProcessStruct = Module.ProcessStruct;
+        x.a = 10;
+        x.b = 20;
+        x.c = 30;
+        x.msg = "Temp Struct";
+        var y = ProcessStruct(x, 10.531, "Multiplying");
+        console.log("After Processed: ", y, y.a, y.b, y.c, y.msg);
+
+        //JavaScript code must explicitly delete any C++ object handles it has received, or the Emscripten heap will grow indefinitely.
+        x.delete();
+        y.delete();
+    }
+
+</script>
+</html>
